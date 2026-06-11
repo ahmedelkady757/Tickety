@@ -20,10 +20,10 @@ dependencies:
   hive_flutter: ^1.1.0
   shared_preferences: ^2.3.2
 
-  # Firebase
-  firebase_core: ^3.6.0
-  firebase_auth: ^5.3.1
-  google_sign_in: ^6.2.1
+  # Firebase — enabled in feature/data-auth after flutterfire configure
+  # firebase_core: ^3.6.0
+  # firebase_auth: ^5.3.1
+  # google_sign_in: ^6.2.1
 
   # Navigation
   go_router: ^14.2.7
@@ -34,16 +34,16 @@ dependencies:
   # Images
   cached_network_image: ^3.3.1
 
-  # Maps & Location
-  google_maps_flutter: ^2.9.0
-  geolocator: ^13.0.1
+  # Maps & Location — enabled in feature/ui-explore
+  # google_maps_flutter: ^2.9.0
+  # geolocator: ^13.0.1
 
-  # QR & Barcode
-  qr_flutter: ^4.1.0
-  barcode_widget: ^2.0.4
+  # QR & Barcode — enabled in feature/ui-details-booking
+  # qr_flutter: ^4.1.0
+  # barcode_widget: ^2.0.4
 
-  # Notifications
-  flutter_local_notifications: ^17.2.3
+  # Notifications — enabled in feature/data-auth
+  # flutter_local_notifications: ^17.2.3
 
   # Utilities
   intl: ^0.19.0
@@ -55,6 +55,7 @@ dependencies:
   shimmer: ^3.0.0
   smooth_page_indicator: ^1.2.0+3
   pin_code_fields: ^8.0.1
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:
