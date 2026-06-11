@@ -1,5 +1,3 @@
-/// Base class for all domain failures.
-/// Follows the Open/Closed principle — extend to add new failure types.
 abstract class Failure {
   final String message;
   const Failure(this.message);

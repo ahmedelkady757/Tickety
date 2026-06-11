@@ -1,10 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:injectable/injectable.dart';
 import '../constants/app_constants.dart';
 import '../error/exceptions.dart';
 
-/// Injects Ticketmaster API key into every request automatically.
 class ApiKeyInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -13,7 +11,6 @@ class ApiKeyInterceptor extends Interceptor {
   }
 }
 
-/// Maps DioException types to domain exceptions.
 class ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
@@ -39,28 +36,23 @@ class ErrorInterceptor extends Interceptor {
   }
 }
 
-/// GetIt injectable module registering the singleton Dio instance.
-@module
-abstract class ApiModule {
-  @singleton
-  Dio get dio {
-    final baseUrl = dotenv.env['TICKETMASTER_BASE_URL'] ??
-        AppConstants.ticketmasterBaseUrl;
+Dio createDioClient() {
+  final baseUrl = dotenv.env['TICKETMASTER_BASE_URL'] ??
+      AppConstants.ticketmasterBaseUrl;
 
-    final dio = Dio(
-      BaseOptions(
-        baseUrl: baseUrl,
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 20),
-        headers: {'Accept': 'application/json'},
-      ),
-    );
+  final dio = Dio(
+    BaseOptions(
+      baseUrl: baseUrl,
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 20),
+      headers: {'Accept': 'application/json'},
+    ),
+  );
 
-    dio.interceptors.addAll([
-      ApiKeyInterceptor(),
-      ErrorInterceptor(),
-    ]);
+  dio.interceptors.addAll([
+    ApiKeyInterceptor(),
+    ErrorInterceptor(),
+  ]);
 
-    return dio;
-  }
+  return dio;
 }

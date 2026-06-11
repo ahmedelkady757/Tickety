@@ -1,5 +1,3 @@
-/// Custom exception types thrown by data layer.
-/// Converted to [Failure] objects by repository implementations.
 class ServerException implements Exception {
   final String message;
   final int? statusCode;
