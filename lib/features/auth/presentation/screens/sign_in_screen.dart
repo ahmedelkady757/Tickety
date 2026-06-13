@@ -101,9 +101,7 @@ class _SignInScreenState extends State<SignInScreen> {
               AppButton.primary(
                 text: 'SIGN IN',
                 hasArrow: true,
-                onPressed: () {
-                  // Logic phase: AuthCubit.signIn()
-                },
+                onPressed: () => context.go(AppRoutes.eventDetails),
               ),
               const SizedBox(height: 32),
               Row(

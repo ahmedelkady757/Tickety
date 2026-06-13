@@ -33,7 +33,6 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // In the logic phase, check auth state here via AuthCubit.
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) context.go(AppRoutes.onboarding);
     });
@@ -66,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen>
                       const Icon(Icons.event, size: 80, color: AppColors.primary),
                 ),
                 const SizedBox(height: 16),
-                Text(
+                const Text(
                   'Tickety',
                   style: TextStyle(
                     fontSize: 36,
