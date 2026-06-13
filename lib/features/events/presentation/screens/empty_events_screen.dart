@@ -43,7 +43,7 @@ class _EmptyEventsScreenState extends State<EmptyEventsScreen>
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go(AppRoutes.signIn);
+              context.go(AppRoutes.home);
             }
           },
         ),

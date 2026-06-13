@@ -52,7 +52,7 @@ class SignUpScreen extends StatelessWidget {
               AppButton.primary(
                 text: 'SIGN UP',
                 hasArrow: true,
-                onPressed: () => context.go(AppRoutes.emptyEvents),
+                onPressed: () => context.go(AppRoutes.signIn),
 
               ),
               const SizedBox(height: 32),

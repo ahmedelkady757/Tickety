@@ -26,7 +26,13 @@ class EventDetailsScreen extends StatelessWidget {
                 EventHeaderImage(
                   imagePath: 'assets/images/event_details_header.png',
                   goingCount: 20,
-                  onBackTap: () => context.go(AppRoutes.signIn),
+                  onBackTap: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go(AppRoutes.home);
+                    }
+                  },
                   onInviteTap: () {},
                   onBookmarkTap: () {},
                 ),

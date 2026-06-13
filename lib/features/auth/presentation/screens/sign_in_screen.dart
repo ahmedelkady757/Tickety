@@ -101,7 +101,7 @@ class _SignInScreenState extends State<SignInScreen> {
               AppButton.primary(
                 text: 'SIGN IN',
                 hasArrow: true,
-                onPressed: () => context.go(AppRoutes.eventDetails),
+                onPressed: () => context.go(AppRoutes.home),
               ),
               const SizedBox(height: 32),
               Row(
