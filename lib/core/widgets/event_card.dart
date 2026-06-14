@@ -103,7 +103,6 @@ class EventCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // Bookmark badge
                   Positioned(
                     top: 8,
                     right: 8,
@@ -140,7 +139,6 @@ class EventCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              // Going pile
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: Row(
@@ -158,7 +156,6 @@ class EventCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              // Location
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: Row(
@@ -185,7 +182,6 @@ class EventCard extends StatelessWidget {
     );
   }
 
-  // Row version for lists (like search results or profile events)
   Widget _buildVerticalRowCard(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
@@ -205,7 +201,6 @@ class EventCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Left image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: imagePath != null
@@ -219,7 +214,6 @@ class EventCard extends StatelessWidget {
                   : _buildPlaceholderSquare(),
             ),
             const SizedBox(width: 16),
-            // Right info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

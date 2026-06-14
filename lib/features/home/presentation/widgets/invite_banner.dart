@@ -44,9 +44,9 @@ class InviteBanner extends StatelessWidget {
                     foregroundColor: AppColors.textPrimary,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   ),
                   child: Text(
                     'INVITE',
@@ -59,6 +59,7 @@ class InviteBanner extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(width: 24),
           Image.asset(
             'assets/images/invite_gift_box.png',
             height: 90,

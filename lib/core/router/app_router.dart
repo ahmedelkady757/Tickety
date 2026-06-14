@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../features/auth/presentation/screens/splash_screen.dart';
-import '../../features/auth/presentation/screens/onboarding_screen.dart';
-import '../../features/auth/presentation/screens/sign_in_screen.dart';
-import '../../features/auth/presentation/screens/sign_up_screen.dart';
-import '../../features/auth/presentation/screens/forgot_password_screen.dart';
-import '../../features/events/presentation/screens/event_details_screen.dart';
+import '../../features/onboarding/presentation/screens/splash_screen.dart';
+import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
+import '../../features/signin/presentation/screens/sign_in_screen.dart';
+import '../../features/signup/presentation/screens/sign_up_screen.dart';
+import '../../features/forgotpassword/presentation/screens/forgot_password_screen.dart';
+import '../../features/event-details/presentation/screens/event_details_screen.dart';
 import '../../features/events/presentation/screens/empty_events_screen.dart';
-import '../../features/events/presentation/screens/home_screen.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/events/presentation/screens/search_screen.dart';
 import '../../features/events/presentation/screens/see_all_events_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
@@ -31,7 +31,7 @@ class AppRoutes {
 }
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: AppRoutes.home,
+  initialLocation: AppRoutes.splash,
   debugLogDiagnostics: false,
   routes: [
     GoRoute(

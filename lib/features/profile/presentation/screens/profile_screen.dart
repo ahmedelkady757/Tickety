@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tickety/features/events/presentation/widgets/event_card.dart';
+import '../../../../core/widgets/event_card.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -17,10 +17,10 @@ class ProfileScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(
-          backgroundColor: AppColors.primary,
+          backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
               if (context.canPop()) {
                 context.pop();
@@ -30,28 +30,24 @@ class ProfileScreen extends StatelessWidget {
             },
           ),
           title: Text(
-            'Profile',
-            style: AppTextStyles.headlineMedium.copyWith(color: Colors.white),
+            '',
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.more_vert, color: Colors.white),
+              icon: const Icon(Icons.more_vert, color: Colors.black),
               onPressed: () {},
             ),
           ],
         ),
         body: Column(
           children: [
-            // Header
             const ProfileHeader(
-              name: 'Ashfak Sayem',
-              followersCount: '350',
-              followingCount: '346',
-              reviewsCount: '28',
+              name: 'David Silbia',
+              followingCount: '350',
+              followersCount: '346',
             ),
             const SizedBox(height: 16),
 
-            // TabBar
             TabBar(
               labelColor: AppColors.primary,
               unselectedLabelColor: AppColors.textSecondary,
@@ -67,15 +63,11 @@ class ProfileScreen extends StatelessWidget {
             ),
             const Divider(height: 1, color: AppColors.divider),
 
-            // TabBarView
             Expanded(
               child: TabBarView(
                 children: [
-                  // About Tab
                   _buildAboutTab(),
-                  // Events Tab
                   _buildEventsTab(context),
-                  // Reviews Tab
                   _buildReviewsTab(),
                 ],
               ),

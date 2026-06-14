@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/core.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_text_styles.dart';
 import '../widgets/event_header_image.dart';
-import '../widgets/event_info_row.dart';
+import '../../../../core/widgets/event_info_row.dart';
 import '../widgets/event_about_section.dart';
 import '../widgets/organizer_row.dart';
 import '../widgets/bottom_cta_bar.dart';

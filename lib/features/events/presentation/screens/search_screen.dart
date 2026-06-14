@@ -3,10 +3,43 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../widgets/event_card.dart';
+import '../../../../core/widgets/event_card.dart';
+import '../../viewmodel/search_viewmodel.dart';
 
-class SearchScreen extends StatelessWidget {
+class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
+
+  @override
+  State<SearchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  final SearchViewModel _viewModel = SearchViewModel();
+
+  @override
+  void initState() {
+    super.initState();
+    _handleSearch('');
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleSearch(String query) async {
+    setState(() {
+      _viewModel.isLoading = true;
+    });
+    
+    await _viewModel.searchEvents(query);
+    
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +67,11 @@ class SearchScreen extends StatelessWidget {
                 children: [
                   const Icon(Icons.search, color: AppColors.primary, size: 24),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: TextField(
-                      decoration: InputDecoration(
+                      controller: _searchController,
+                      onChanged: _handleSearch,
+                      decoration: const InputDecoration(
                         hintText: 'Search...',
                         border: InputBorder.none,
                       ),
@@ -69,40 +104,54 @@ class SearchScreen extends StatelessWidget {
 
               // Search Results List
               Expanded(
-                child: ListView(
-                  children: [
-                    EventCard(
-                      title: 'International Band Music Concert',
-                      dateDay: '14',
-                      dateMonth: 'Dec',
-                      location: 'Gala Convention Center, London',
-                      imagePath: 'assets/images/event_details_header.png',
-                      isHorizontal: false,
-                      onTap: () => context.push(AppRoutes.eventDetails),
-                    ),
-                    EventCard(
-                      title: 'Global Sports Championship 2026',
-                      dateDay: '18',
-                      dateMonth: 'Dec',
-                      location: 'Wembley Stadium, London',
-                      isHorizontal: false,
-                      onTap: () => context.push(AppRoutes.eventDetails),
-                    ),
-                    EventCard(
-                      title: 'Woodland Jazz Festival',
-                      dateDay: '20',
-                      dateMonth: 'Dec',
-                      location: 'Hyde Park, London',
-                      isHorizontal: false,
-                      onTap: () => context.push(AppRoutes.eventDetails),
-                    ),
-                  ],
-                ),
+                child: _buildBody(),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_viewModel.isLoading) {
+      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+    }
+
+    final results = _viewModel.results;
+    
+    if (_searchController.text.isEmpty && results.isEmpty) {
+      return Center(
+        child: Text(
+          'Type to search for amazing events.',
+          style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary),
+        ),
+      );
+    }
+    
+    if (results.isEmpty) {
+      return Center(
+        child: Text(
+          'No events found.',
+          style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary),
+        ),
+      );
+    }
+    
+    return ListView.builder(
+      itemCount: results.length,
+      itemBuilder: (context, index) {
+        final event = results[index];
+        return EventCard(
+          title: event['title'] ?? '',
+          dateDay: event['dateDay'] ?? '',
+          dateMonth: event['dateMonth'] ?? '',
+          location: event['location'] ?? '',
+          imagePath: event['imagePath'],
+          isHorizontal: false,
+          onTap: () => context.push(AppRoutes.eventDetails),
+        );
+      },
     );
   }
 }

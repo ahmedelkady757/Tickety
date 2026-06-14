@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../widgets/event_card.dart';
+import '../../../../core/widgets/event_card.dart';
 import '../widgets/home_header.dart';
 import '../widgets/categories_bar.dart';
 import '../widgets/invite_banner.dart';
@@ -15,6 +15,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+      drawer: _buildDrawer(context),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -22,11 +23,9 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Curved blue top header container
                 _buildTopHeader(context),
                 const SizedBox(height: 24),
 
-                // Categories
                 CategoriesBar(
                   onCategorySelected: (category) {
                     // Filter logic in the future
@@ -34,14 +33,12 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // Upcoming Events Header
                 _buildSectionHeader(
                   title: 'Upcoming Events',
                   onSeeAllTap: () => context.push(AppRoutes.seeAllEvents),
                 ),
                 const SizedBox(height: 16),
 
-                // Upcoming Events Horizontal List
                 SizedBox(
                   height: 270,
                   child: ListView(
@@ -72,14 +69,12 @@ class HomeScreen extends StatelessWidget {
                 const InviteBanner(),
                 const SizedBox(height: 16),
 
-                // Nearby You Header
                 _buildSectionHeader(
                   title: 'Nearby You',
                   onSeeAllTap: () => context.push(AppRoutes.seeAllEvents),
                 ),
                 const SizedBox(height: 16),
 
-                // Nearby You List (Horizontal or vertical)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
@@ -107,7 +102,6 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
 
-          // Bottom Navigation Bar
           Positioned(
             bottom: 0,
             left: 0,
@@ -132,7 +126,14 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 24),
-          const HomeHeader(location: 'New York, USA'),
+          Builder(
+            builder: (context) {
+              return HomeHeader(
+                location: 'New York, USA',
+                onMenuTap: () => Scaffold.of(context).openDrawer(),
+              );
+            }
+          ),
           const SizedBox(height: 20),
           // Search Input Row
           Padding(
@@ -240,7 +241,7 @@ class HomeScreen extends StatelessWidget {
             children: [
               _buildNavBarItem(
                 icon: Icons.explore,
-                label: 'Explore',
+                label: 'Home',
                 isActive: true,
                 onTap: () {},
               ),
@@ -249,29 +250,12 @@ class HomeScreen extends StatelessWidget {
                 label: 'Events',
                 onTap: () => context.push(AppRoutes.seeAllEvents),
               ),
-              const SizedBox(width: 48), // Spacer for central FAB
-              _buildNavBarItem(
-                icon: Icons.location_on,
-                label: 'Map',
-                onTap: () {},
-              ),
               _buildNavBarItem(
                 icon: Icons.person,
                 label: 'Profile',
                 onTap: () => context.push(AppRoutes.profile),
               ),
             ],
-          ),
-          // Floating Action Button
-          Positioned(
-            top: -24,
-            child: FloatingActionButton(
-              onPressed: () {},
-              backgroundColor: AppColors.primary,
-              elevation: 4,
-              shape: const CircleBorder(),
-              child: const Icon(Icons.add, color: Colors.white, size: 28),
-            ),
           ),
         ],
       ),
@@ -298,6 +282,157 @@ class HomeScreen extends StatelessWidget {
             style: TextStyle(color: color, fontSize: 12, fontWeight: isActive ? FontWeight.bold : FontWeight.normal),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      backgroundColor: Colors.white,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const CircleAvatar(
+                radius: 36,
+                backgroundColor: AppColors.primaryLight,
+                backgroundImage: AssetImage('assets/images/user_avatar.png'), // Or appropriate image
+                child: Icon(Icons.person, color: Colors.white, size: 40),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Ashfak Sayem',
+                style: AppTextStyles.headlineMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 40),
+              
+              _buildDrawerItem(
+                icon: Icons.person_outline,
+                title: 'My Profile',
+                onTap: () {
+                  context.pop();
+                  context.push(AppRoutes.profile);
+                },
+              ),
+              _buildDrawerItem(
+                icon: Icons.chat_bubble_outline,
+                title: 'Massage',
+                badgeCount: 3,
+                onTap: () {},
+              ),
+              _buildDrawerItem(
+                icon: Icons.calendar_today_outlined,
+                title: 'Calender',
+                onTap: () {},
+              ),
+              _buildDrawerItem(
+                icon: Icons.bookmark_border,
+                title: 'Bookmark',
+                onTap: () {},
+              ),
+              _buildDrawerItem(
+                icon: Icons.mail_outline,
+                title: 'Contact Us',
+                onTap: () {},
+              ),
+              _buildDrawerItem(
+                icon: Icons.settings_outlined,
+                title: 'Settings',
+                onTap: () {},
+              ),
+              _buildDrawerItem(
+                icon: Icons.help_outline,
+                title: 'Helps & FAQs',
+                onTap: () {},
+              ),
+              _buildDrawerItem(
+                icon: Icons.logout,
+                title: 'Sign Out',
+                onTap: () {
+                  context.pop();
+                  context.go(AppRoutes.signIn);
+                },
+              ),
+
+              const Spacer(),
+              
+              Container(
+                width: 150,
+                child: ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.workspace_premium, color: Colors.cyanAccent),
+                  label: const Text('Upgrade Pro'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.cyanAccent.withOpacity(0.15),
+                    foregroundColor: Colors.cyanAccent,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    int? badgeCount,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: InkWell(
+        onTap: onTap,
+        child: Row(
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(icon, color: AppColors.textSecondary, size: 28),
+                if (badgeCount != null)
+                  Positioned(
+                    right: -4,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.orange,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        badgeCount.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(width: 16),
+            Text(
+              title,
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

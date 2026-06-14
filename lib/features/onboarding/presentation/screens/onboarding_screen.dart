@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../../../core/core.dart';
+import '../../viewmodel/onboarding_viewmodel.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -38,8 +39,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  void _next() {
+  void _next() async {
     if (_currentPage == _onboardingData.length - 1) {
+      await OnboardingViewModel().completeOnboarding();
+      if (!context.mounted) return;
       context.go(AppRoutes.signIn);
     } else {
       _pageController.nextPage(
@@ -76,7 +79,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               currentPage: _currentPage,
               totalPages: _onboardingData.length,
               pageController: _pageController,
-              onSkip: () => context.go(AppRoutes.signIn),
+              onSkip: () async {
+                await OnboardingViewModel().completeOnboarding();
+                if (!context.mounted) return;
+                context.go(AppRoutes.signIn);
+              },
               onNext: _next,
               isLast: _currentPage == _onboardingData.length - 1,
             ),

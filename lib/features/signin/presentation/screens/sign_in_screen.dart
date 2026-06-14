@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/core.dart';
-import '../widgets/auth_header.dart';
+import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/auth_header.dart';
+import '../../viewmodel/sign_in_viewmodel.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -12,6 +14,32 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   bool _rememberMe = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final SignInViewModel _viewModel = SignInViewModel();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleSignIn() async {
+    setState(() {}); // Trigger rebuild to show loader
+    await _viewModel.signIn(_emailController.text, _passwordController.text);
+    
+    if (!mounted) return;
+    setState(() {}); // Trigger rebuild to hide loader
+
+    if (_viewModel.isSuccess) {
+      context.go(AppRoutes.home);
+    } else if (_viewModel.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_viewModel.error!), backgroundColor: AppColors.error),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,19 +81,21 @@ class _SignInScreenState extends State<SignInScreen> {
                 subtitle: '',
               ),
               const SizedBox(height: 32),
-              const AppTextField(
+              AppTextField(
+                controller: _emailController,
                 labelText: 'Email Address',
                 hintText: 'Enter your email',
                 keyboardType: TextInputType.emailAddress,
-                prefixIcon: Icon(Icons.email_outlined, color: AppColors.textSecondary),
+                prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 20),
-              const AppTextField(
+              AppTextField(
+                controller: _passwordController,
                 labelText: 'Password',
                 hintText: 'Enter your password',
                 isPassword: true,
                 textInputAction: TextInputAction.done,
-                prefixIcon: Icon(Icons.lock_outline, color: AppColors.textSecondary),
+                prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 12),
               Row(
@@ -98,11 +128,13 @@ class _SignInScreenState extends State<SignInScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-              AppButton.primary(
-                text: 'SIGN IN',
-                hasArrow: true,
-                onPressed: () => context.go(AppRoutes.home),
-              ),
+              _viewModel.isLoading
+                  ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                  : AppButton.primary(
+                      text: 'SIGN IN',
+                      hasArrow: true,
+                      onPressed: _handleSignIn,
+                    ),
               const SizedBox(height: 32),
               Row(
                 children: [
@@ -154,7 +186,6 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                 ],
               ),
-
             ],
           ),
         ),

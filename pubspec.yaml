@@ -10,9 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # State Management
-  flutter_bloc: ^8.1.6
-
   # Networking
   dio: ^5.4.3+1
 
@@ -33,10 +30,6 @@ dependencies:
 
   # Images
   cached_network_image: ^3.3.1
-
-  # Maps & Location — enabled in feature/ui-explore
-  # google_maps_flutter: ^2.9.0
-  # geolocator: ^13.0.1
 
   # QR & Barcode — enabled in feature/ui-details-booking
   # qr_flutter: ^4.1.0

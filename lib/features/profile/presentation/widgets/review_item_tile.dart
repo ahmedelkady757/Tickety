@@ -37,7 +37,6 @@ class ReviewItemTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header info
           Row(
             children: [
               CircleAvatar(
@@ -66,7 +65,6 @@ class ReviewItemTile extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    // Rating stars
                     Row(
                       children: List.generate(5, (index) {
                         return Icon(
@@ -88,7 +86,6 @@ class ReviewItemTile extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          // Comment Text
           Text(
             comment,
             style: AppTextStyles.bodyLarge.copyWith(
