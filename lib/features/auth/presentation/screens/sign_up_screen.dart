@@ -52,9 +52,8 @@ class SignUpScreen extends StatelessWidget {
               AppButton.primary(
                 text: 'SIGN UP',
                 hasArrow: true,
-                onPressed: () {
-                  // Logic phase: AuthCubit.signUp()
-                },
+                onPressed: () => context.go(AppRoutes.emptyEvents),
+
               ),
               const SizedBox(height: 32),
                Row(

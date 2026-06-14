@@ -5,8 +5,9 @@ import '../../features/auth/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/sign_in_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../../features/events/presentation/screens/event_details_screen.dart';
+import '../../features/events/presentation/screens/empty_events_screen.dart';
 
-/// Route path constants — add new routes as features are built.
 class AppRoutes {
   AppRoutes._();
 
@@ -15,16 +16,12 @@ class AppRoutes {
   static const signIn = '/auth/sign-in';
   static const signUp = '/auth/sign-up';
   static const forgotPassword = '/auth/forgot-password';
+  static const eventDetails = '/event-details';
+  static const emptyEvents = '/empty-events';
 
-  // Phase 2+ (uncomment as implemented)
-  // static const home = '/home';
-  // static const explore = '/explore';
-  // static const eventDetails = '/event/:id';
-  // static const tickets = '/tickets';
-  // static const profile = '/profile';
+
 }
 
-/// Central router — routes are added progressively with each feature sprint.
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.splash,
   debugLogDiagnostics: false,
@@ -48,6 +45,14 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.forgotPassword,
       builder: (_, __) => const ForgotPasswordScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.eventDetails,
+      builder: (_, __) => const EventDetailsScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.emptyEvents,
+      builder: (_, __) => const EmptyEventsScreen(),
     ),
   ],
   errorBuilder: (context, state) => const Scaffold(
