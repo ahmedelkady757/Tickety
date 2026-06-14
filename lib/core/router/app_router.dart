@@ -11,6 +11,7 @@ import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/events/presentation/screens/search_screen.dart';
 import '../../features/events/presentation/screens/see_all_events_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/event-details/presentation/screens/map_screen.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -26,6 +27,7 @@ class AppRoutes {
   static const search = '/search';
   static const seeAllEvents = '/see-all-events';
   static const profile = '/profile';
+  static const map = '/map';
 
 
 }
@@ -77,6 +79,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.profile,
       builder: (_, __) => const ProfileScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.map,
+      builder: (_, __) => const MapScreen(),
     ),
   ],
   errorBuilder: (context, state) => const Scaffold(

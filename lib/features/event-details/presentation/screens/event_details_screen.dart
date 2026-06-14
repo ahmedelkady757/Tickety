@@ -58,10 +58,11 @@ class EventDetailsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
 
-                      const EventInfoRow(
+                      EventInfoRow(
                         icon: Icons.location_on,
                         title: 'Gala Convention Center',
                         subtitle: '36 Guild Street London, UK',
+                        onTap: () => context.push(AppRoutes.map),
                       ),
                       const SizedBox(height: 24),
 
