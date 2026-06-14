@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/core.dart';
-import '../widgets/auth_header.dart';
+import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/auth_header.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});

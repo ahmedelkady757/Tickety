@@ -43,7 +43,7 @@ class _EmptyEventsScreenState extends State<EmptyEventsScreen>
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go(AppRoutes.signIn);
+              context.go(AppRoutes.home);
             }
           },
         ),
@@ -129,37 +129,6 @@ class _EventsTabBar extends StatelessWidget {
           Tab(text: 'UPCOMING'),
           Tab(text: 'PAST EVENTS'),
         ],
-      ),
-    );
-  }
-}
-
-class _EmptyStateIllustration extends StatelessWidget {
-  const _EmptyStateIllustration();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Image.asset(
-        'assets/images/empty_events_calendar.png',
-        height: 200,
-        width: 200,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            height: 200,
-            width: 200,
-            decoration: const BoxDecoration(
-              color: AppColors.primarySurface,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.calendar_today,
-              size: 80,
-              color: AppColors.primary,
-            ),
-          );
-        },
       ),
     );
   }

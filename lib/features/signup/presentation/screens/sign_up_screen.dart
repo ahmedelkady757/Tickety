@@ -1,10 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/core.dart';
-import '../widgets/auth_header.dart';
+import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/auth_header.dart';
+import '../../viewmodel/sign_up_viewmodel.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final SignUpViewModel _viewModel = SignUpViewModel();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleSignUp() async {
+    setState(() {}); // Trigger rebuild for loading state
+    await _viewModel.signUp(_nameController.text, _emailController.text, _passwordController.text);
+    
+    if (!mounted) return;
+    setState(() {}); // Hide loader
+    
+    if (_viewModel.isSuccess) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Account Created! Please Sign In.'), backgroundColor: Colors.green),
+      );
+      context.go(AppRoutes.signIn);
+    } else if (_viewModel.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_viewModel.error!), backgroundColor: AppColors.error),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,34 +68,38 @@ class SignUpScreen extends StatelessWidget {
                 subtitle: '',
               ),
               const SizedBox(height: 32),
-              const AppTextField(
+              AppTextField(
+                controller: _nameController,
                 labelText: 'Full Name',
                 hintText: 'Enter your full name',
-                prefixIcon: Icon(Icons.person_outline, color: AppColors.textSecondary),
+                prefixIcon: const Icon(Icons.person_outline, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 20),
-              const AppTextField(
+              AppTextField(
+                controller: _emailController,
                 labelText: 'Email Address',
                 hintText: 'Enter your email',
                 keyboardType: TextInputType.emailAddress,
-                prefixIcon: Icon(Icons.email_outlined, color: AppColors.textSecondary),
+                prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 20),
-              const AppTextField(
+              AppTextField(
+                controller: _passwordController,
                 labelText: 'Password',
                 hintText: 'Create a password',
                 isPassword: true,
-                prefixIcon: Icon(Icons.lock_outline, color: AppColors.textSecondary),
+                prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 32),
-              AppButton.primary(
-                text: 'SIGN UP',
-                hasArrow: true,
-                onPressed: () => context.go(AppRoutes.emptyEvents),
-
-              ),
+              _viewModel.isLoading
+                  ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                  : AppButton.primary(
+                      text: 'SIGN UP',
+                      hasArrow: true,
+                      onPressed: _handleSignUp,
+                    ),
               const SizedBox(height: 32),
-               Row(
+              Row(
                 children: [
                   const Expanded(child: Divider(color: AppColors.border)),
                   Padding(
@@ -93,13 +136,13 @@ class SignUpScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                   Text(
+                  Text(
                     'Already have an account? ',
                     style: AppTextStyles.bodyMedium,
                   ),
                   GestureDetector(
                     onTap: () => context.pop(),
-                    child:  Text(
+                    child: Text(
                       'Sign In',
                       style: AppTextStyles.link,
                     ),

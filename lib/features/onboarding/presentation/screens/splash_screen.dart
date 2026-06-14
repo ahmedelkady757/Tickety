@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/core.dart';
+import '../../viewmodel/onboarding_viewmodel.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -33,8 +34,15 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    Future.delayed(const Duration(milliseconds: 2500), () {
-      if (mounted) context.go(AppRoutes.onboarding);
+    Future.delayed(const Duration(milliseconds: 2500), () async {
+      final viewModel = OnboardingViewModel();
+      final hasSeen = await viewModel.hasSeenOnboarding();
+      if (!context.mounted) return;
+      if (hasSeen) {
+        context.go(AppRoutes.signIn);
+      } else {
+        context.go(AppRoutes.onboarding);
+      }
     });
   }
 

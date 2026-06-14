@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../features/auth/presentation/screens/splash_screen.dart';
-import '../../features/auth/presentation/screens/onboarding_screen.dart';
-import '../../features/auth/presentation/screens/sign_in_screen.dart';
-import '../../features/auth/presentation/screens/sign_up_screen.dart';
-import '../../features/auth/presentation/screens/forgot_password_screen.dart';
-import '../../features/events/presentation/screens/event_details_screen.dart';
+import '../../features/onboarding/presentation/screens/splash_screen.dart';
+import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
+import '../../features/signin/presentation/screens/sign_in_screen.dart';
+import '../../features/signup/presentation/screens/sign_up_screen.dart';
+import '../../features/forgotpassword/presentation/screens/forgot_password_screen.dart';
+import '../../features/event-details/presentation/screens/event_details_screen.dart';
 import '../../features/events/presentation/screens/empty_events_screen.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/events/presentation/screens/search_screen.dart';
+import '../../features/events/presentation/screens/see_all_events_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/event-details/presentation/screens/map_screen.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -18,6 +23,11 @@ class AppRoutes {
   static const forgotPassword = '/auth/forgot-password';
   static const eventDetails = '/event-details';
   static const emptyEvents = '/empty-events';
+  static const home = '/home';
+  static const search = '/search';
+  static const seeAllEvents = '/see-all-events';
+  static const profile = '/profile';
+  static const map = '/map';
 
 
 }
@@ -53,6 +63,26 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.emptyEvents,
       builder: (_, __) => const EmptyEventsScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.home,
+      builder: (_, __) => const HomeScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.search,
+      builder: (_, __) => const SearchScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.seeAllEvents,
+      builder: (_, __) => const SeeAllEventsScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.profile,
+      builder: (_, __) => const ProfileScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.map,
+      builder: (_, __) => const MapScreen(),
     ),
   ],
   errorBuilder: (context, state) => const Scaffold(
