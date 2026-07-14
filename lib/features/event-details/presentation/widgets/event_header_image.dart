@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -5,18 +6,22 @@ import 'going_bar.dart';
 
 class EventHeaderImage extends StatelessWidget {
   final String? imagePath;
+  final String? imageUrl;
   final int goingCount;
   final VoidCallback? onBackTap;
   final VoidCallback? onBookmarkTap;
   final VoidCallback? onInviteTap;
+  final bool isFavorite;
 
   const EventHeaderImage({
     super.key,
     this.imagePath,
+    this.imageUrl,
     this.goingCount = 20,
     this.onBackTap,
     this.onBookmarkTap,
     this.onInviteTap,
+    this.isFavorite = false,
   });
 
   @override
@@ -24,16 +29,7 @@ class EventHeaderImage extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // Hero image
-        imagePath != null
-            ? Image.asset(
-          imagePath!,
-          width: double.infinity,
-          height: 240,
-          fit: BoxFit.cover,
-          errorBuilder: _placeholder,
-        )
-            : _placeholder(context, Object(), StackTrace.current),
+        _buildHeroImage(context),
 
         // Back & bookmark buttons
         SafeArea(
@@ -49,7 +45,7 @@ class EventHeaderImage extends StatelessWidget {
                   },
                 ),
                 _CircularIconButton(
-                  icon: Icons.bookmark_border,
+                  icon: isFavorite ? Icons.favorite : Icons.favorite_border,
                   onTap: onBookmarkTap ?? () {},
                 ),
               ],
@@ -69,6 +65,29 @@ class EventHeaderImage extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Widget _buildHeroImage(BuildContext context) {
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: imageUrl!,
+        width: double.infinity,
+        height: 240,
+        fit: BoxFit.cover,
+        placeholder: (_, __) => _placeholder(context, Object(), null),
+        errorWidget: (_, __, ___) => _placeholder(context, Object(), null),
+      );
+    }
+    if (imagePath != null) {
+      return Image.asset(
+        imagePath!,
+        width: double.infinity,
+        height: 240,
+        fit: BoxFit.cover,
+        errorBuilder: _placeholder,
+      );
+    }
+    return _placeholder(context, Object(), StackTrace.current);
   }
 
   Widget _placeholder(BuildContext context, Object error, StackTrace? stackTrace) {

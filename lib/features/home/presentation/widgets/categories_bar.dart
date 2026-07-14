@@ -14,19 +14,18 @@ class CategoryItem {
   });
 }
 
-class CategoriesBar extends StatefulWidget {
+class CategoriesBar extends StatelessWidget {
   final Function(CategoryItem) onCategorySelected;
+  final String selectedLabel;
 
-  const CategoriesBar({super.key, required this.onCategorySelected});
+  const CategoriesBar({
+    super.key,
+    required this.onCategorySelected,
+    this.selectedLabel = 'All',
+  });
 
-  @override
-  State<CategoriesBar> createState() => _CategoriesBarState();
-}
-
-class _CategoriesBarState extends State<CategoriesBar> {
-  int _selectedIndex = 0;
-
-  final List<CategoryItem> _categories = const [
+  static const _categories = [
+    CategoryItem(label: 'All', icon: Icons.apps, color: AppColors.primary),
     CategoryItem(label: 'Sports', icon: Icons.sports_basketball, color: Color(0xFFF0635A)),
     CategoryItem(label: 'Music', icon: Icons.music_note, color: Color(0xFFF19E38)),
     CategoryItem(label: 'Food', icon: Icons.fastfood, color: Color(0xFF29D697)),
@@ -43,15 +42,10 @@ class _CategoriesBarState extends State<CategoriesBar> {
         itemCount: _categories.length,
         itemBuilder: (context, index) {
           final item = _categories[index];
-          final isSelected = _selectedIndex == index;
+          final isSelected = item.label == selectedLabel;
 
           return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedIndex = index;
-              });
-              widget.onCategorySelected(item);
-            },
+            onTap: () => onCategorySelected(item),
             child: Container(
               margin: const EdgeInsets.only(right: 12),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -6,7 +7,7 @@ class MapEventCard extends StatelessWidget {
   final String title;
   final String date;
   final String location;
-  final String imagePath;
+  final String? imageUrl;
   final VoidCallback onTap;
 
   const MapEventCard({
@@ -14,7 +15,7 @@ class MapEventCard extends StatelessWidget {
     required this.title,
     required this.date,
     required this.location,
-    required this.imagePath,
+    this.imageUrl,
     required this.onTap,
   });
 
@@ -40,44 +41,23 @@ class MapEventCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
-                imagePath,
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: 80,
-                  height: 80,
-                  color: Colors.grey.shade200,
-                  child: const Icon(Icons.image, color: Colors.grey),
-                ),
-              ),
+              child: _buildImage(),
             ),
             const SizedBox(width: 16),
-            // Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          date,
-                          style: AppTextStyles.labelMedium.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const Icon(Icons.bookmark, color: AppColors.error, size: 20),
-                    ],
+                  Text(
+                    date,
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -113,6 +93,33 @@ class MapEventCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildImage() {
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: imageUrl!,
+        width: 80,
+        height: 80,
+        fit: BoxFit.cover,
+        placeholder: (_, __) => Container(
+          width: 80,
+          height: 80,
+          color: AppColors.primarySurface,
+        ),
+        errorWidget: (_, __, ___) => _placeholder(),
+      );
+    }
+    return _placeholder();
+  }
+
+  Widget _placeholder() {
+    return Container(
+      width: 80,
+      height: 80,
+      color: AppColors.primarySurface,
+      child: const Icon(Icons.image, color: AppColors.primary),
     );
   }
 }

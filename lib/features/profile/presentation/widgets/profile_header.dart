@@ -4,16 +4,18 @@ import '../../../../core/theme/app_text_styles.dart';
 
 class ProfileHeader extends StatelessWidget {
   final String name;
+  final String? email;
   final String followingCount;
   final String followersCount;
-  final String? avatarImagePath;
+  final String? avatarImageUrl;
 
   const ProfileHeader({
     super.key,
     required this.name,
+    this.email,
     required this.followingCount,
     required this.followersCount,
-    this.avatarImagePath,
+    this.avatarImageUrl,
   });
 
   @override
@@ -30,17 +32,10 @@ class ProfileHeader extends StatelessWidget {
           child: CircleAvatar(
             radius: 48,
             backgroundColor: AppColors.primaryLight,
-            child: avatarImagePath != null
-                ? ClipOval(
-                    child: Image.asset(
-                      avatarImagePath!,
-                      width: 96,
-                      height: 96,
-                      fit: BoxFit.cover,
-                      errorBuilder: (c, e, s) => const Icon(Icons.person, size: 50, color: Colors.white),
-                    ),
-                  )
-                : const Icon(Icons.person, size: 50, color: Colors.white),
+            backgroundImage: avatarImageUrl != null ? NetworkImage(avatarImageUrl!) : null,
+            child: avatarImageUrl == null
+                ? const Icon(Icons.person, size: 50, color: Colors.white)
+                : null,
           ),
         ),
         const SizedBox(height: 16),
@@ -51,6 +46,13 @@ class ProfileHeader extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        if (email != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            email!,
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+          ),
+        ],
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,

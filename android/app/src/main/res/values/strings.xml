@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tickety</string>
+
+    <!-- Facebook SDK credentials -->
+    <string name="facebook_app_id">1716992276179516</string>
+    <string name="facebook_client_token">c47f77e57a059617a207028ed792b09c</string>
+    <string name="fb_login_protocol_scheme">fb1716992276179516</string>
+</resources>

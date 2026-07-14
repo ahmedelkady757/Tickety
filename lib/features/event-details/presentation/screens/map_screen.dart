@@ -1,232 +1,317 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../viewmodel/map_viewmodel.dart';
+import '../../../home/domain/entities/event_entity.dart';
+import '../cubit/map_cubit.dart';
+import '../cubit/map_state.dart';
 import '../widgets/map_event_card.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+  final EventEntity? focusEvent;
+
+  const MapScreen({super.key, this.focusEvent});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
 }
 
 class _MapScreenState extends State<MapScreen> {
-  final MapViewModel _viewModel = MapViewModel();
+  GoogleMapController? _mapController;
+  Set<Marker> _markers = {};
+
+  static const _categories = [
+    ('All', Icons.apps, AppColors.primary),
+    ('Sports', Icons.sports_basketball, Color(0xFFF0635A)),
+    ('Music', Icons.music_note, Color(0xFFF19E38)),
+    ('Food', Icons.fastfood, Color(0xFF29D697)),
+    ('Art', Icons.palette, Color(0xFF46CDFB)),
+  ];
 
   @override
   void initState() {
     super.initState();
-    _viewModel.addListener(() {
-      setState(() {});
-    });
+    if (widget.focusEvent == null) {
+      context.read<MapCubit>().init();
+    }
   }
 
-  @override
-  void dispose() {
-    _viewModel.dispose();
-    super.dispose();
+  Future<void> _buildMarkers(List<EventEntity> events) async {
+    final markers = <Marker>{};
+    for (final event in events) {
+      if (event.lat == null || event.lng == null) continue;
+      final color = _colorForCategory(event.classification);
+      final icon = await _markerIcon(color, _iconForCategory(event.classification));
+      markers.add(Marker(
+        markerId: MarkerId(event.id),
+        position: LatLng(event.lat!, event.lng!),
+        icon: icon,
+        infoWindow: InfoWindow(title: event.name, snippet: event.venueName),
+      ));
+    }
+    if (mounted) setState(() => _markers = markers);
+  }
+
+  Color _colorForCategory(String? classification) {
+    final c = classification?.toLowerCase() ?? '';
+    if (c.contains('sport')) return const Color(0xFFF0635A);
+    if (c.contains('music')) return const Color(0xFFF19E38);
+    if (c.contains('food')) return const Color(0xFF29D697);
+    if (c.contains('art') || c.contains('theatre')) return const Color(0xFF46CDFB);
+    return AppColors.primary;
+  }
+
+  IconData _iconForCategory(String? classification) {
+    final c = classification?.toLowerCase() ?? '';
+    if (c.contains('sport')) return Icons.sports_basketball;
+    if (c.contains('music')) return Icons.music_note;
+    if (c.contains('food')) return Icons.fastfood;
+    if (c.contains('art') || c.contains('theatre')) return Icons.palette;
+    return Icons.event;
+  }
+
+  Future<BitmapDescriptor> _markerIcon(Color color, IconData iconData) async {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    const size = 100.0;
+
+    final paint = Paint()..color = Colors.white;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(const Rect.fromLTWH(0, 0, size, size), const Radius.circular(25)),
+      paint,
+    );
+
+    final innerPaint = Paint()..color = color;
+    canvas.drawCircle(const Offset(size / 2, size / 2), size / 2 - 10, innerPaint);
+
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
+    textPainter.text = TextSpan(
+      text: String.fromCharCode(iconData.codePoint),
+      style: TextStyle(
+        fontSize: size / 2,
+        fontFamily: iconData.fontFamily,
+        package: iconData.fontPackage,
+        color: Colors.white,
+      ),
+    );
+    textPainter.layout();
+    textPainter.paint(
+      canvas,
+      Offset((size - textPainter.width) / 2, (size - textPainter.height) / 2),
+    );
+
+    final image = await recorder.endRecording().toImage(size.toInt(), size.toInt());
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    if (byteData == null) return BitmapDescriptor.defaultMarker;
+    return BitmapDescriptor.bytes(byteData.buffer.asUint8List());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // 1. Google Map
-          GoogleMap(
-            initialCameraPosition: _viewModel.initialCameraPosition,
-            markers: _viewModel.markers,
-            myLocationEnabled: true,
-            myLocationButtonEnabled: false,
-            zoomControlsEnabled: false,
-            mapToolbarEnabled: false,
-            onMapCreated: (controller) {
-              _viewModel.setMapController(controller);
-            },
-          ),
+    return BlocConsumer<MapCubit, MapState>(
+      listener: (context, state) {
+        if (state is MapLoaded) {
+          _buildMarkers(state.mappableEvents);
+          _mapController?.animateCamera(
+            CameraUpdate.newCameraPosition(state.cameraPosition),
+          );
+        }
+      },
+      builder: (context, state) {
+        if (state is MapLoading || state is MapInitial) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+          );
+        }
 
-          // 2. Top Search Bar and Target Button
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 16,
-            left: 24,
-            right: 24,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary, size: 20),
-                          onPressed: () => context.pop(),
-                        ),
-                        const Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Find for food or restaurant...',
-                              hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14),
-                              border: InputBorder.none,
+        if (state is MapError) {
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(state.message, style: const TextStyle(color: AppColors.error)),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () => context.read<MapCubit>().init(focusEvent: widget.focusEvent),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        if (state is! MapLoaded) return const SizedBox.shrink();
+
+        return Scaffold(
+          body: Stack(
+            children: [
+              GoogleMap(
+                initialCameraPosition: state.cameraPosition,
+                markers: _markers,
+                myLocationEnabled: true,
+                myLocationButtonEnabled: false,
+                zoomControlsEnabled: false,
+                mapToolbarEnabled: false,
+                onMapCreated: (controller) => _mapController = controller,
+              ),
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 16,
+                left: 24,
+                right: 24,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.search, color: AppColors.primary, size: 22),
+                              onPressed: () => context.push(AppRoutes.search),
+                            ),
+                            Expanded(
+                              child: Text(
+                                'Events near you',
+                                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      height: 56,
+                      width: 56,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.my_location, color: AppColors.primary),
+                        onPressed: () {
+                          _mapController?.animateCamera(
+                            CameraUpdate.newCameraPosition(
+                              CameraPosition(target: LatLng(state.lat, state.lng), zoom: 12),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 88,
+                left: 0,
+                right: 0,
+                child: SizedBox(
+                  height: 44,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    itemCount: _categories.length,
+                    itemBuilder: (context, index) {
+                      final (label, icon, color) = _categories[index];
+                      final isSelected = (state.selectedCategory ?? 'All') == label;
+                      return GestureDetector(
+                        onTap: () => context.read<MapCubit>().filterByCategory(
+                              label == 'All' ? null : label,
+                            ),
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected ? color : Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(icon, color: isSelected ? Colors.white : color, size: 18),
+                              const SizedBox(width: 6),
+                              Text(
+                                label,
+                                style: AppTextStyles.labelLarge.copyWith(
+                                  color: isSelected ? Colors.white : AppColors.textPrimary,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      );
+                    },
+                  ),
+                ),
+              ),
+              if (state.events.isEmpty)
+                const Positioned(
+                  bottom: 160,
+                  left: 24,
+                  right: 24,
+                  child: Center(
+                    child: Text('No events found nearby.', style: TextStyle(color: AppColors.textSecondary)),
+                  ),
+                )
+              else
+                Positioned(
+                  bottom: 24,
+                  left: 0,
+                  right: 0,
+                  child: SizedBox(
+                    height: 120,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.only(left: 24),
+                      itemCount: state.events.length,
+                      itemBuilder: (context, index) {
+                        final event = state.events[index];
+                        return MapEventCard(
+                          title: event.name,
+                          date: '${event.day} ${event.month}${event.time != null ? ' • ${event.formattedTime}' : ''}',
+                          location: event.locationLabel,
+                          imageUrl: event.imageUrl,
+                          onTap: () => context.push(AppRoutes.eventDetails, extra: event),
+                        );
+                      },
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
-                Container(
-                  height: 56,
-                  width: 56,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.my_location, color: AppColors.primary),
-                    onPressed: () {
-                      // Move camera to current location (mock)
-                    },
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
-
-          // 3. Category Chips
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 88,
-            left: 0,
-            right: 0,
-            child: SizedBox(
-              height: 44,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                children: [
-                  _buildCategoryChip('Sports', Icons.sports_basketball, Colors.redAccent),
-                  _buildCategoryChip('Music', Icons.music_note, Colors.blueAccent),
-                  _buildCategoryChip('Food', Icons.restaurant, Colors.teal),
-                ],
-              ),
-            ),
-          ),
-
-          // 4. Floating Action Button (Menu/Filter)
-          Positioned(
-            bottom: 160,
-            right: 24,
-            child: Container(
-              height: 56,
-              width: 56,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.4),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.filter_list, color: Colors.white),
-                onPressed: () {
-                  // Show filters
-                },
-              ),
-            ),
-          ),
-
-          // 5. Event Cards ListView
-          Positioned(
-            bottom: 24,
-            left: 0,
-            right: 0,
-            child: SizedBox(
-              height: 120,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.only(left: 24),
-                itemCount: _viewModel.filteredEvents.length,
-                itemBuilder: (context, index) {
-                  final event = _viewModel.filteredEvents[index];
-                  return MapEventCard(
-                    title: event.title,
-                    date: event.date,
-                    location: event.location,
-                    imagePath: event.imagePath,
-                    onTap: () {
-                      // Navigate to event details
-                    },
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryChip(String label, IconData icon, Color color) {
-    final isSelected = _viewModel.selectedCategory == label;
-    return GestureDetector(
-      onTap: () => _viewModel.selectCategory(label),
-      child: Container(
-        margin: const EdgeInsets.only(right: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: isSelected ? color : Colors.transparent,
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: AppTextStyles.labelLarge.copyWith(
-                color: isSelected ? AppColors.textPrimary : AppColors.textSecondary,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 }

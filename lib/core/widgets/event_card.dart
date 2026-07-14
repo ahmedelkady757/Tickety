@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -8,7 +9,8 @@ class EventCard extends StatelessWidget {
   final String dateDay;
   final String dateMonth;
   final String location;
-  final String? imagePath;
+  final String? imagePath;    // local asset
+  final String? imageUrl;     // network URL (takes priority)
   final int goingCount;
   final VoidCallback? onTap;
   final VoidCallback? onBookmarkTap;
@@ -21,6 +23,7 @@ class EventCard extends StatelessWidget {
     required this.dateMonth,
     required this.location,
     this.imagePath,
+    this.imageUrl,
     this.goingCount = 20,
     this.onTap,
     this.onBookmarkTap,
@@ -59,15 +62,7 @@ class EventCard extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(14),
-                    child: imagePath != null
-                        ? Image.asset(
-                            imagePath!,
-                            height: 130,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: _buildPlaceholder,
-                          )
-                        : _buildPlaceholder(context, Object(), StackTrace.current),
+                    child: _buildImage(height: 130, width: double.infinity),
                   ),
                   // Date badge
                   Positioned(
@@ -203,15 +198,7 @@ class EventCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: imagePath != null
-                  ? Image.asset(
-                      imagePath!,
-                      height: 80,
-                      width: 80,
-                      fit: BoxFit.cover,
-                      errorBuilder: (c, e, s) => _buildPlaceholderSquare(),
-                    )
-                  : _buildPlaceholderSquare(),
+              child: _buildImage(height: 80, width: 80),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -263,21 +250,48 @@ class EventCard extends StatelessWidget {
     );
   }
 
+  Widget _buildImage({required double height, required double width}) {
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: imageUrl!,
+        height: height,
+        width: width,
+        fit: BoxFit.cover,
+        placeholder: (_, __) => Container(
+          height: height,
+          width: width,
+          color: AppColors.primarySurface,
+          child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+        ),
+        errorWidget: (_, __, ___) => _buildPlaceholderBox(height: height, width: width),
+      );
+    } else if (imagePath != null) {
+      return Image.asset(
+        imagePath!,
+        height: height,
+        width: width,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _buildPlaceholderBox(height: height, width: width),
+      );
+    } else {
+      return _buildPlaceholderBox(height: height, width: width);
+    }
+  }
+
   Widget _buildPlaceholder(BuildContext context, Object error, StackTrace? stackTrace) {
+    return _buildPlaceholderBox(height: 130, width: double.infinity);
+  }
+
+  Widget _buildPlaceholderBox({required double height, required double width}) {
     return Container(
-      height: 130,
-      width: double.infinity,
+      height: height,
+      width: width,
       color: AppColors.primarySurface,
       child: const Icon(Icons.image, color: AppColors.primary, size: 40),
     );
   }
 
   Widget _buildPlaceholderSquare() {
-    return Container(
-      height: 80,
-      width: 80,
-      color: AppColors.primarySurface,
-      child: const Icon(Icons.image, color: AppColors.primary, size: 30),
-    );
+    return _buildPlaceholderBox(height: 80, width: 80);
   }
 }

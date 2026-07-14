@@ -107,9 +107,13 @@ class AppButton extends StatelessWidget {
                 SvgPicture.asset(iconPath!, height: 24, width: 24),
                 const SizedBox(width: 12),
               ],
-              Text(
-                text,
-                style: _getTextStyle(),
+              Flexible(
+                child: Text(
+                  text,
+                  style: _getTextStyle(),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               if (hasArrow && !isLoading) ...[
                 const SizedBox(width: 8),
@@ -157,7 +161,9 @@ class AppButton extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+            padding: type == AppButtonType.social
+                ? const EdgeInsets.symmetric(vertical: 16, horizontal: 12)
+                : const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           ),
           child: buttonChild,
         );

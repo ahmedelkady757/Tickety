@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/core.dart';
 import '../../viewmodel/onboarding_viewmodel.dart';
 
@@ -35,13 +36,26 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
 
     Future.delayed(const Duration(milliseconds: 2500), () async {
+      if (!context.mounted) return;
+
+      // 1. Check if user has already seen onboarding
       final viewModel = OnboardingViewModel();
       final hasSeen = await viewModel.hasSeenOnboarding();
+
       if (!context.mounted) return;
-      if (hasSeen) {
-        context.go(AppRoutes.signIn);
-      } else {
+
+      // 2. Check if a user is currently logged into Firebase
+      final currentUser = FirebaseAuth.instance.currentUser;
+
+      if (!hasSeen) {
+        // First time — show onboarding
         context.go(AppRoutes.onboarding);
+      } else if (currentUser != null) {
+        // Already logged in — go straight to home
+        context.go(AppRoutes.home);
+      } else {
+        // Seen onboarding but not logged in — go to sign in
+        context.go(AppRoutes.signIn);
       }
     });
   }

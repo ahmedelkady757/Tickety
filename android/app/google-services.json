@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "126474934716",
+    "project_id": "tickety-dd7c0",
+    "storage_bucket": "tickety-dd7c0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:126474934716:android:645d355f838bb6491073b9",
+        "android_client_info": {
+          "package_name": "com.tickety.tickety"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "126474934716-5irfekm7eop439k5qul7se8j3qmob6tc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tickety.tickety",
+            "certificate_hash": "b8cfa865e3bbe1fd2ea39f0295e20f2506173eaf"
+          }
+        },
+        {
+          "client_id": "126474934716-5geqr866t1ov7fiodrhc9l34n1ipmktu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAM1z6Wct3G07lmIPn_49iZji2OL4xNA_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "126474934716-5geqr866t1ov7fiodrhc9l34n1ipmktu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "126474934716-8fmp97rrq2s62n8343nv52jc6p7u6sak.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tickety.tickety"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
