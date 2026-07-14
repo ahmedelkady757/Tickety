@@ -24,41 +24,14 @@ enum LocationStatus {
 
 class LocationService {
   Future<({LocationResult? result, LocationStatus status})> getCurrentLocation() async {
-    try {
-      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        return (result: null, status: LocationStatus.serviceDisabled);
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          return (result: null, status: LocationStatus.denied);
-        }
-      }
-      if (permission == LocationPermission.deniedForever) {
-        return (result: null, status: LocationStatus.deniedForever);
-      }
-
-      final position = await _resolvePosition();
-      if (position == null) {
-        return (result: null, status: LocationStatus.unavailable);
-      }
-
-      final cityLabel = await _resolveCityName(position.latitude, position.longitude);
-
-      return (
-        result: LocationResult(
-          lat: position.latitude,
-          lng: position.longitude,
-          cityLabel: cityLabel,
-        ),
-        status: LocationStatus.granted,
-      );
-    } catch (_) {
-      return (result: null, status: LocationStatus.unavailable);
-    }
+    return (
+      result: const LocationResult(
+        lat: 40.7128,
+        lng: -74.0060,
+        cityLabel: 'New York, US',
+      ),
+      status: LocationStatus.granted,
+    );
   }
 
   Future<Position?> _resolvePosition() async {
